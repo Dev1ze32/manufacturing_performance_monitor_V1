@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 100" role="img" aria-label="Pioneer Adhesives, Inc.">
+  <!--
+    Transparent background version — designed for dark sidebars.
+    No white pill, no border. Just the red badge + text.
+  -->
+
+  <!-- Red D-badge -->
+  <path d="M 0,0 L 290,0 Q 345,0 345,50 Q 345,100 290,100 L 0,100 Z"
+        fill="#CC0E0E"/>
+
+  <!-- Diagonal white slash on far left -->
+  <polygon points="16,0 36,0 16,100 0,100" fill="white" opacity="0.88"/>
+
+  <!-- "Pioneer" in white bold italic -->
+  <text
+    x="42" y="72"
+    font-family="Arial Black, Franklin Gothic Heavy, Impact, sans-serif"
+    font-size="66"
+    font-weight="900"
+    font-style="italic"
+    fill="white"
+    letter-spacing="-1"
+  >Pioneer</text>
+
+  <!-- "Adhesives, Inc." in white bold italic (for dark bg) -->
+  <text
+    x="360" y="72"
+    font-family="Arial Black, Franklin Gothic Heavy, Impact, sans-serif"
+    font-size="56"
+    font-weight="900"
+    font-style="italic"
+    fill="white"
+    letter-spacing="-1"
+  >Adhesives, Inc.</text>
+
+</svg>

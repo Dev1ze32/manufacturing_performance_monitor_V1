@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manufacturing Performance Monitoring System</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <!-- Integrated Pioneer Logo here -->
+      <div class="sidebar-logo">
+        <img src="pioneer-logo.svg" alt="Pioneer Adhesives, Inc. Trademark" class="logo-image">
+      </div>
+      <div class="sidebar-title">Performance Monitor</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">Dashboards</div>
+        <button class="nav-item active" data-page="executive" onclick="navigateTo(this.dataset.page)">Executive Summary</button>
+        <button class="nav-item" data-page="cost" onclick="navigateTo(this.dataset.page)">Cost Dashboard</button>
+        <button class="nav-item" data-page="manhours" onclick="navigateTo(this.dataset.page)">Runrate & Manhours</button>
+        <button class="nav-item" data-page="loss" onclick="navigateTo(this.dataset.page)">Loss Analysis</button>
+        <button class="nav-item" data-page="budget" onclick="navigateTo(this.dataset.page)">OB vs Actual</button>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Data Entry</div>
+        <button class="nav-item" data-page="import" onclick="navigateTo(this.dataset.page)">Import Excel</button>
+        <button class="nav-item" data-page="entry-utilities" onclick="navigateTo(this.dataset.page)">Actual Cost & Volume</button>
+        <button class="nav-item" data-page="entry-budget" onclick="navigateTo(this.dataset.page)">OB / Target</button>
+        <button class="nav-item" data-page="entry-capacity" onclick="navigateTo(this.dataset.page)">Runrate Efficiency</button>
+        <button class="nav-item" data-page="entry-manhours" onclick="navigateTo(this.dataset.page)">Manhours</button>
+      </div>
+    </nav>
+    <div class="month-filter">
+      <label>Viewing Period</label>
+      <!-- Hidden select keeps getGlobalMonth() working without changing any other JS -->
+      <select id="globalMonth" style="display:none" onchange="onGlobalMonthChange()">
+        <option value="">All Months</option>
+      </select>
+      <div id="period-picker-root"></div>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div id="page-executive"></div>
+    <div id="page-cost" style="display:none"></div>
+    <div id="page-production" style="display:none"></div>
+    <div id="page-manhours" style="display:none"></div>
+    <div id="page-loss" style="display:none"></div>
+    <div id="page-budget" style="display:none"></div>
+    <div id="page-import" style="display:none"></div>
+    <div id="page-entry-utilities" style="display:none"></div>
+    <div id="page-entry-production" style="display:none"></div>
+    <div id="page-entry-capacity" style="display:none"></div>
+    <div id="page-entry-manhours" style="display:none"></div>
+    <div id="page-entry-budget" style="display:none"></div>
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module" src="./js/app.js?v=api-backend-20260615"></script>
+</body>
+</html>
