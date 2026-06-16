@@ -1,9 +1,8 @@
-// Replace the top line with:
+import { getAccessToken, handleUnauthorized } from './auth.js';
+
 const API_BASE = window.API_BASE_URL || (() => {
   const port = window.location.port;
-  // If served directly from the FastAPI server on port 8000, use relative path
   if (!port || port === '8000') return '/api';
-  // Otherwise talk to the backend explicitly
   return 'http://127.0.0.1:8000/api';
 })();
 
@@ -13,12 +12,22 @@ async function request(method, path, body) {
     headers: { Accept: 'application/json' }
   };
 
+  const token = getAccessToken();
+  if (token) {
+    options.headers.Authorization = `Bearer ${token}`;
+  }
+
   if (body !== undefined) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body);
   }
 
   const response = await fetch(`${API_BASE}${path}`, options);
+
+  if (response.status === 401 && token) {
+    handleUnauthorized();
+  }
+
   if (!response.ok) {
     let detail = response.statusText;
     try {
@@ -36,6 +45,7 @@ async function request(method, path, body) {
 export const api = {
   get: (path) => request('GET', path),
   post: (path, body) => request('POST', path, body),
+  patch: (path, body) => request('PATCH', path, body),
   delete: (path) => request('DELETE', path)
 };
 

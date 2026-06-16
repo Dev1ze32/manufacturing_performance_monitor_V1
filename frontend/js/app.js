@@ -4,17 +4,25 @@ import {
   getGlobalMonth,
   getGlobalQuarter,
   setGlobalMonth,
-  clearGlobalSelection,
   getFY,
   renderPeriodPicker,
   populateMonthFilter,
-  pageSupportsQuarters,
   showToast,
   clearForm,
   fmtMonthLabel,
   getRunrateSummaryRows,
   getManhoursSummaryRows
 } from './utils.js';
+import {
+  canAccessPage,
+  formatRoleLabel,
+  getCurrentUser,
+  logout,
+  restoreSession,
+  setUnauthorizedHandler
+} from './auth.js';
+import { hideLoginScreen, showLoginScreen } from './login.js';
+import { renderAdminPanel } from './admin.js';
 import * as Dashboards from './dashboard.js';
 import * as Forms from './forms.js';
 import * as Importer from './importer.js';
@@ -23,6 +31,7 @@ const DEFAULT_PAGE = 'executive';
 const CURRENT_PAGE_KEY = 'mfg-monitor-current-page';
 
 let currentPage = DEFAULT_PAGE;
+let appReady = false;
 
 function normalizePage(page) {
   return page === 'entry-production' ? 'entry-utilities' : page;
@@ -62,9 +71,57 @@ function initResponsiveNavigation() {
   window.addEventListener('resize', () => { if (window.innerWidth > 1024) setSidebarOpen(false); });
 }
 
-window.navigateTo = function(page) {
+function updateSidebarForRole() {
+  const user = getCurrentUser();
+  const dataEntrySection = document.getElementById('nav-data-entry');
+  const adminSection = document.getElementById('nav-admin');
+  const userBlock = document.getElementById('sidebar-user');
+
+  if (dataEntrySection) {
+    dataEntrySection.style.display = canAccessPage('import') ? '' : 'none';
+  }
+  if (adminSection) {
+    adminSection.style.display = canAccessPage('admin') ? '' : 'none';
+  }
+  if (userBlock && user) {
+    userBlock.innerHTML = `
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">${escapeHtml(user.username)}</div>
+        <div class="sidebar-user-role pill ${rolePillClass(user.role)}">${escapeHtml(formatRoleLabel(user.role))}</div>
+      </div>
+      <button type="button" class="sidebar-logout-btn" id="logout-btn">Sign out</button>
+    `;
+    document.getElementById('logout-btn')?.addEventListener('click', () => {
+      logout();
+      showToast('Signed out.', 'success');
+    });
+  }
+}
+
+function rolePillClass(role) {
+  if (role === 'admin') return 'pill-purple';
+  if (role === 'superuser') return 'pill-blue';
+  return 'pill-gray';
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function resolveAllowedPage(page) {
   page = normalizePage(page);
   if (!document.getElementById('page-' + page)) page = DEFAULT_PAGE;
+  if (!canAccessPage(page)) page = DEFAULT_PAGE;
+  return page;
+}
+
+window.navigateTo = function(page) {
+  if (!appReady) return;
+  page = resolveAllowedPage(page);
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === page);
   });
@@ -72,7 +129,7 @@ window.navigateTo = function(page) {
   document.getElementById('page-' + page).style.display = '';
   currentPage = page;
   storeCurrentPage(page);
-  populateMonthFilter(page);  // handles quarter→month conversion when switching pages
+  populateMonthFilter(page);
   if (window.innerWidth <= 1024) setSidebarOpen(false);
   renderCurrentPage();
 };
@@ -94,7 +151,6 @@ function renderCurrentPage() {
     case 'executive':       Dashboards.renderExecutive(container, resolvedMonth); break;
     case 'cost':            Dashboards.renderCost(container, resolvedMonth); break;
     case 'production':      Dashboards.renderProduction(container, resolvedMonth); break;
-    // manhours and loss both receive quarter so they can aggregate across months
     case 'manhours':        Dashboards.renderManhours(container, resolvedMonth, quarter); break;
     case 'loss':            Dashboards.renderLoss(container, resolvedMonth, quarter); break;
     case 'budget':          Dashboards.renderBudget(container, resolvedMonth); break;
@@ -104,6 +160,7 @@ function renderCurrentPage() {
     case 'entry-capacity':  Forms.renderEntryCapacity(container); break;
     case 'entry-manhours':  Forms.renderEntryManhours(container); break;
     case 'entry-budget':    Forms.renderEntryBudget(container); break;
+    case 'admin':           renderAdminPanel(container); break;
   }
 }
 
@@ -144,14 +201,50 @@ window.clearForm = clearForm;
 Object.entries(Forms).forEach(([name, func]) => { window[name] = func; });
 Object.entries(Importer).forEach(([name, func]) => { window[name] = func; });
 
+async function bootApp() {
+  appReady = false;
+  hideLoginScreen();
+  updateSidebarForRole();
+
+  const toggle = document.getElementById('sidebarToggle');
+  if (toggle) toggle.style.display = '';
+
+  try {
+    await initDB();
+    appReady = true;
+    window.navigateTo(resolveAllowedPage(getStoredPage()));
+  } catch (error) {
+    console.error(error);
+    showToast('Could not connect to the backend API. Start it with: uvicorn backend.server:app --reload --host 127.0.0.1 --port 8000', 'error');
+  }
+}
+
+function showUnauthenticatedState() {
+  appReady = false;
+  showLoginScreen();
+}
+
+async function initAuthFlow() {
+  setUnauthorizedHandler(showUnauthenticatedState);
+
+  try {
+    const user = await restoreSession();
+    if (user) {
+      await bootApp();
+      return;
+    }
+  } catch (_) {
+    /* invalid token — show login */
+  }
+
+  showUnauthenticatedState();
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   initResponsiveNavigation();
-  initDB()
-    .then(() => {
-      window.navigateTo(getStoredPage());
-    })
-    .catch(error => {
-      console.error(error);
-      showToast('Could not connect to the backend API. Start it with: uvicorn backend.server:app --reload --host 127.0.0.1 --port 8000', 'error');
-    });
+  initAuthFlow();
+});
+
+window.addEventListener('auth:login', () => {
+  bootApp();
 });

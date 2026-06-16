@@ -844,6 +844,7 @@ tbody tr:hover td { background: var(--blue-light) !important; }
 .pill-red    { background: var(--red-light);    color: var(--red);    }
 .pill-amber  { background: var(--amber-light);  color: var(--amber);  }
 .pill-gray   { background: var(--gray-100);     color: var(--gray-500); }
+.pill-purple { background: var(--purple-light); color: var(--purple);  }
 
 /* ─────────────────────────────────────────────
    VARIANCE HELPERS
@@ -1069,4 +1070,357 @@ tbody tr:hover td { background: var(--blue-light) !important; }
   .runrate-overview { grid-template-columns: 1fr; }
   .chart-container-lg { height: 240px; }
   .metrics-grid { grid-template-columns: 1fr; }
+}
+
+/* ─────────────────────────────────────────────
+   LOGIN SCREEN (Redesigned Split Layout)
+   ───────────────────────────────────────────── */
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  background: var(--white);
+  padding: 0;
+}
+
+.login-split {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Left Side - Dark Brand Panel */
+.login-left {
+  display: none;
+  background-color: var(--gray-900);
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+@media (min-width: 1024px) {
+  .login-left {
+    display: flex;
+    width: 50%;
+  }
+}
+
+/* Subtle dot pattern */
+.login-left::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image: radial-gradient(#ffffff 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.login-brand-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.brand-logo-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.brand-pioneer {
+  background: var(--red);
+  color: var(--white);
+  font-weight: 800;
+  font-style: italic;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+}
+
+.brand-inc {
+  color: rgba(255,255,255,0.8);
+  font-weight: 600;
+  font-style: italic;
+  font-size: 20px;
+}
+
+.brand-title {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+.brand-subtitle {
+  color: rgba(191, 219, 254, 0.6);
+  max-width: 380px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Right Side - Form Panel */
+.login-right {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(248, 250, 252, 0.5); /* Very subtle gray */
+  padding: 32px;
+}
+
+@media (min-width: 1024px) {
+  .login-right {
+    width: 50%;
+  }
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--white);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+  border: 1px solid var(--gray-100);
+}
+
+.mobile-brand-logo-group {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+@media (min-width: 1024px) {
+  .mobile-brand-logo-group {
+    display: none;
+  }
+}
+
+.mobile-brand-logo-group .brand-pioneer {
+  background: var(--red);
+  color: var(--white);
+  font-weight: 800;
+  font-style: italic;
+  border-radius: 4px;
+  font-size: 20px;
+  padding: 2px 8px;
+}
+
+.mobile-brand-logo-group .brand-inc {
+  font-weight: 600;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+.login-card-head {
+  margin-bottom: 32px;
+}
+
+.login-card-head h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+.login-card-head p {
+  color: var(--gray-500);
+  font-size: 14px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-form .form-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.login-form input:focus {
+  background: var(--white);
+  border-color: var(--blue-mid);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.login-submit {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+}
+
+.login-submit:hover {
+  box-shadow: 0 6px 16px rgba(26, 86, 219, 0.3);
+  transform: translateY(-1px);
+}
+
+.login-error {
+  color: var(--red);
+  background: var(--red-light);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+/* ─────────────────────────────────────────────
+   SIDEBAR USER / LOGOUT
+   ───────────────────────────────────────────── */
+.sidebar-user {
+  padding: 14px 16px 16px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.92);
+  overflow-wrap: anywhere;
+}
+
+.sidebar-user-role {
+  align-self: flex-start;
+}
+
+.sidebar-user .pill {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.88);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.sidebar-user .pill-blue {
+  background: rgba(59,130,246,0.22);
+  color: #bfdbfe;
+  border-color: rgba(59,130,246,0.35);
+}
+
+.sidebar-user .pill-purple {
+  background: rgba(124,58,237,0.22);
+  color: #ddd6fe;
+  border-color: rgba(124,58,237,0.35);
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.82);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s, border-color 0.13s;
+}
+
+.sidebar-logout-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border-color: rgba(255,255,255,0.24);
+}
+
+/* ─────────────────────────────────────────────
+   ADMIN PANEL
+   ───────────────────────────────────────────── */
+.admin-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-create-card {
+  margin-bottom: 0;
+}
+
+.admin-register-form {
+  align-items: end;
+}
+
+.admin-register-actions {
+  justify-content: flex-end;
+}
+
+.admin-users-table {
+  min-width: 640px;
+}
+
+.admin-role-select {
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--gray-700);
+  background: var(--white);
+  min-width: 140px;
+}
+
+.admin-self-note {
+  font-size: 12px;
+  color: var(--gray-400);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+    gap: 24px;
+  }
+
+  .login-brand {
+    text-align: center;
+    padding-bottom: 0;
+  }
+
+  .login-logo,
+  .login-brand-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .login-brand-title {
+    font-size: 22px;
+  }
 }
