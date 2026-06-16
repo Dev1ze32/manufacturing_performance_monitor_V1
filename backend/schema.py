@@ -122,7 +122,29 @@ MIGRATIONS: List[Tuple[int, List[str]]] = [
             "CREATE INDEX IF NOT EXISTS idx_manhours_month_line ON manhours(month, line)",
             "CREATE INDEX IF NOT EXISTS idx_loss_month_line ON loss(month, line)",
         ],
-    )
+    ),
+    (
+        2,
+        [
+            # Roles: user | superuser | admin
+            # 'user'      → dashboard read-only
+            # 'superuser' → dashboard + data entry
+            # 'admin'     → everything + account management
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'user'
+                    CHECK(role IN ('user', 'superuser', 'admin')),
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """,
+            "CREATE INDEX IF NOT EXISTS idx_users_username ON users(username COLLATE NOCASE)",
+        ],
+    ),
 ]
 
 

@@ -14,11 +14,13 @@ if __package__ in (None, ""):
     from backend.config import get_settings
     from backend.database import create_database
     from backend.routes.api import router as api_router
+    from backend.routes.auth import router as auth_router
     from backend.schema import migrate
 else:
     from .config import get_settings
     from .database import create_database
     from .routes.api import router as api_router
+    from .routes.auth import router as auth_router
     from .schema import migrate
 
 
@@ -45,7 +47,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_router)
+app.include_router(auth_router)   # /api/auth/*
+app.include_router(api_router)    # /api/*
 
 
 @app.get("/api")
