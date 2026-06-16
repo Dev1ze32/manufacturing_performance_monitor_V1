@@ -19,7 +19,29 @@ import * as Dashboards from './dashboard.js';
 import * as Forms from './forms.js';
 import * as Importer from './importer.js';
 
-let currentPage = 'executive';
+const DEFAULT_PAGE = 'executive';
+const CURRENT_PAGE_KEY = 'mfg-monitor-current-page';
+
+let currentPage = DEFAULT_PAGE;
+
+function normalizePage(page) {
+  return page === 'entry-production' ? 'entry-utilities' : page;
+}
+
+function getStoredPage() {
+  try {
+    const page = normalizePage(localStorage.getItem(CURRENT_PAGE_KEY) || DEFAULT_PAGE);
+    return document.getElementById('page-' + page) ? page : DEFAULT_PAGE;
+  } catch (_) {
+    return DEFAULT_PAGE;
+  }
+}
+
+function storeCurrentPage(page) {
+  try {
+    localStorage.setItem(CURRENT_PAGE_KEY, page);
+  } catch (_) { /* ignore storage errors */ }
+}
 
 function setSidebarOpen(isOpen) {
   const sidebar = document.getElementById('sidebar');
@@ -41,13 +63,15 @@ function initResponsiveNavigation() {
 }
 
 window.navigateTo = function(page) {
-  if (page === 'entry-production') page = 'entry-utilities';
+  page = normalizePage(page);
+  if (!document.getElementById('page-' + page)) page = DEFAULT_PAGE;
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === page);
   });
   document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
   document.getElementById('page-' + page).style.display = '';
   currentPage = page;
+  storeCurrentPage(page);
   populateMonthFilter(page);  // handles quarter→month conversion when switching pages
   if (window.innerWidth <= 1024) setSidebarOpen(false);
   renderCurrentPage();
@@ -124,8 +148,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initResponsiveNavigation();
   initDB()
     .then(() => {
-      populateMonthFilter(currentPage);
-      renderCurrentPage();
+      window.navigateTo(getStoredPage());
     })
     .catch(error => {
       console.error(error);

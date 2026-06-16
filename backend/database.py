@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from pathlib import Path
+import shutil
 import sqlite3
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
@@ -45,15 +46,34 @@ class Database(ABC):
 class SQLiteDatabase(Database):
     dialect = "sqlite"
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, seed_path: Optional[Path] = None):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._copy_seed_database(seed_path)
+        self._disable_wal_mode()
 
-    def _connect(self) -> sqlite3.Connection:
+    def _copy_seed_database(self, seed_path: Optional[Path]) -> None:
+        if self.path.exists() or not seed_path or not seed_path.exists():
+            return
+        if seed_path.resolve() == self.path.resolve():
+            return
+        shutil.copy2(seed_path, self.path)
+
+    def _disable_wal_mode(self) -> None:
         conn = sqlite3.connect(self.path, timeout=30)
+        try:
+            conn.execute("PRAGMA journal_mode = DELETE")
+        finally:
+            conn.close()
+
+    def _connect(self, *, readonly: bool = False) -> sqlite3.Connection:
+        if readonly and self.path.exists():
+            uri = self.path.as_uri() + "?mode=ro"
+            conn = sqlite3.connect(uri, timeout=30, uri=True)
+        else:
+            conn = sqlite3.connect(self.path, timeout=30)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
-        conn.execute("PRAGMA journal_mode = WAL")
         conn.execute("PRAGMA busy_timeout = 5000")
         return conn
 
@@ -75,7 +95,7 @@ class SQLiteDatabase(Database):
         await self._run_in_worker(self._execute_batch_sync, statements)
 
     def _fetch_all_sync(self, sql: str, params: Params = None) -> List[Dict[str, Any]]:
-        conn = self._connect()
+        conn = self._connect(readonly=True)
         try:
             cursor = conn.execute(sql, params or {})
             return [dict(row) for row in cursor.fetchall()]
@@ -129,7 +149,7 @@ class PostgresDatabase(Database):
 
 def create_database(settings: Settings) -> Database:
     if settings.database_backend == "sqlite":
-        return SQLiteDatabase(settings.sqlite_path)
+        return SQLiteDatabase(settings.sqlite_path, settings.sqlite_seed_path)
     if settings.database_backend == "postgres":
         return PostgresDatabase()
     raise DatabaseError(f"Unsupported DB_BACKEND: {settings.database_backend}")

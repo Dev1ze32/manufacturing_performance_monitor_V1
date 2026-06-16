@@ -14,11 +14,24 @@ const cache = {
   obActual: []
 };
 
+let refreshPromise = null;
+
 export function getCache() {
   return cache;
 }
 
 export async function refreshDataCache() {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = loadDataCache()
+    .finally(() => {
+      refreshPromise = null;
+    });
+
+  return refreshPromise;
+}
+
+async function loadDataCache() {
   const [
     actualCosts,
     obTargets,

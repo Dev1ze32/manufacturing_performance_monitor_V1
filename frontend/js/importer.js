@@ -364,7 +364,7 @@ async function applyParsedData(parsed) {
     if (await upsertImportedBudget(month, nullIfMissing(r.utility_budget), nullIfMissing(r.rm_budget), nullIfMissing(r.volume_budget))) totals.budget++;
   }
 
-  for (const r of parsed.capacity) {
+  for (const r of parsed.capacity.values()) {
     if (isAllNull(r, ['capacity', 'actual_output', 'machine_availability'])) continue;
     if (await upsertImportedCapacity({
       month: r.month,
@@ -377,7 +377,7 @@ async function applyParsedData(parsed) {
     }
   }
 
-  for (const r of parsed.capacity_weekly) {
+  for (const r of parsed.capacity_weekly.values()) {
     if (isAllNull(r, ['capacity', 'actual_output', 'machine_availability'])) continue;
     if (await upsertImportedWeeklyCapacity({
       month: r.month,
@@ -392,7 +392,7 @@ async function applyParsedData(parsed) {
     }
   }
 
-  for (const r of parsed.manhours) {
+  for (const r of parsed.manhours.values()) {
     if (isAllZeroOrNull(r, ['planned_reg', 'actual_reg', 'planned_ot', 'actual_ot', 'absenteeism', 'working_days', 'manpower'])) continue;
     if (await upsertImportedManhours({
       month: r.month,
