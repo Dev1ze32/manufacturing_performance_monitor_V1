@@ -75,22 +75,31 @@ function updateSidebarForRole() {
   const user = getCurrentUser();
   const dataEntrySection = document.getElementById('nav-data-entry');
   const adminSection = document.getElementById('nav-admin');
-  const userBlock = document.getElementById('sidebar-user');
+  if (dataEntrySection) dataEntrySection.style.display = canAccessPage('import') ? '' : 'none';
+  if (adminSection) adminSection.style.display = canAccessPage('admin') ? '' : 'none';
 
-  if (dataEntrySection) {
-    dataEntrySection.style.display = canAccessPage('import') ? '' : 'none';
+  const profileBtn = document.getElementById('profile-btn');
+  const profileDropdown = document.getElementById('profile-dropdown');
+  if (!profileBtn || !user) return;
+
+  const initials = user.username.slice(0, 2).toUpperCase();
+  profileBtn.textContent = initials;
+
+  const nameEl = document.getElementById('profile-name');
+  const roleEl = document.getElementById('profile-role');
+  if (nameEl) nameEl.textContent = user.username;
+  if (roleEl) {
+    roleEl.textContent = formatRoleLabel(user.role);
+    roleEl.className = `user-role pill ${rolePillClass(user.role)}`;
   }
-  if (adminSection) {
-    adminSection.style.display = canAccessPage('admin') ? '' : 'none';
-  }
-  if (userBlock && user) {
-    userBlock.innerHTML = `
-      <div class="sidebar-user-info">
-        <div class="sidebar-user-name">${escapeHtml(user.username)}</div>
-        <div class="sidebar-user-role pill ${rolePillClass(user.role)}">${escapeHtml(formatRoleLabel(user.role))}</div>
-      </div>
-      <button type="button" class="sidebar-logout-btn" id="logout-btn">Sign out</button>
-    `;
+
+  if (!profileBtn._wired) {
+    profileBtn._wired = true;
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      profileDropdown?.classList.toggle('open');
+    });
+    document.addEventListener('click', () => profileDropdown?.classList.remove('open'));
     document.getElementById('logout-btn')?.addEventListener('click', () => {
       logout();
       showToast('Signed out.', 'success');

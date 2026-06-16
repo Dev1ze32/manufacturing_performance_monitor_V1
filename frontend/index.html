@@ -22,6 +22,21 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
 <div class="app" id="app-shell" style="display:none">
+  <div class="profile-float" id="profile-float">
+    <button class="profile-btn" id="profile-btn" aria-label="User menu"></button>
+    <div class="profile-dropdown" id="profile-dropdown">
+      <div class="user-name" id="profile-name"></div>
+      <div class="user-role pill" id="profile-role"></div>
+      <button class="logout-btn" id="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Sign out
+      </button>
+    </div>
+  </div>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <!-- Integrated Pioneer Logo here -->
@@ -60,7 +75,6 @@
       </select>
       <div id="period-picker-root"></div>
     </div>
-    <div class="sidebar-user" id="sidebar-user"></div>
   </aside>
 
   <main class="main" id="main">

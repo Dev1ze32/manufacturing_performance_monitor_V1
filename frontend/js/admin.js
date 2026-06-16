@@ -48,7 +48,7 @@ export async function renderAdminPanel(container) {
           <div class="form-group">
             <label for="admin-new-username">Username</label>
             <input id="admin-new-username" type="text" autocomplete="off" required minlength="3" maxlength="64" placeholder="e.g. jsmith">
-            <span class="form-hint">At least 3 characters.</span>
+            
           </div>
           <div class="form-group">
             <label for="admin-new-password">Password</label>
@@ -61,7 +61,6 @@ export async function renderAdminPanel(container) {
             </select>
           </div>
           <div class="form-group admin-register-actions">
-            <label>&nbsp;</label>
             <button type="submit" class="btn btn-primary" id="admin-register-btn">Create account</button>
           </div>
         </form>
